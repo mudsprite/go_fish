@@ -1,0 +1,98 @@
+{%extends "layout.html"%}
+{% block content %}
+<div class="row text-center border-bottom">
+  <div class="col-lg">
+    <h1>Go Fish Game!</h1>
+  </div>
+</div>
+
+<div class="cotainer m-3">
+
+  <!-- opponent deck -->
+  <div class="row text-center">
+    <div class="col-lg">
+      <h5>{{ opp.name }} Hand:</h5>
+    </div>
+  </div>
+  <div class="row">
+    {%  for card in opp.hand %}
+    <div class="col bg-light m-1">
+      <div class="card m-2" style="width: 100px; height: 150px;">
+        <div class="card-body bg-dark">
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+
+  <!-- Center of the table -->
+  <div class="row">
+    <div class="col-lg bg-light m-1 text-center">
+      <h5>
+        Cards Left in Deck:
+      </h5>
+      <h5>
+        {{ deck_len }}
+      </h5>
+    </div>
+    <div class="col-lg bg-light m-1 text-center">
+      <h5>
+        Center
+      </h5>
+    </div>
+    <div class="col-lg bg-light m-1 text-center">
+      <h5>
+        {{ opp.name }} Pairs:
+      </h5>
+      <h5>
+        {{ opp_pair_len }}
+      </h5>
+      <h5>
+        {{ first_player.name }} Pairs:
+      </h5>
+      <h5>
+        {{ your_pair_len }}
+      </h5>
+    </div>
+  </div>
+
+  <!-- players cards -->
+  <div class="row text-center">
+    <div class="col-lg">
+      <h5>
+        {{ first_player.name }} Hand:
+      </h5>
+      <small>
+        Select a card to play.
+      </small>
+    </div>
+  </div>
+  <div class="row">
+    {%  for card in first_player.hand %}
+    <div class="col bg-light m-1">
+      <a href="{{ first_player.debug_info(fresh_deck,opp) }}">
+        <div class="card m-2" style="width: 100px; height: 150px;">
+          <span class="text-left">{{ card[1:] }}</span>
+          <div class="card-body text-center">
+            <h1>
+              <span>
+                {% if card[:1] == 's' %}
+                &spades;
+                {% elif card[:1] == 'h' %}
+                &hearts;
+                {% elif card[:1] == 'c' %}
+                &clubs;
+                {% elif card[:1] == 'd' %}
+                &diamond;
+                {% endif %}
+              </span>
+            </h1>
+          </div>
+          <span class="text-right">{{ card[1:] }}</span>
+        </div>
+      </a>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock content %}
