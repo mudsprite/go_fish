@@ -1,4 +1,5 @@
 #Back end concept for go fish card game in python
+
 # GENERATE A RANDOM 7 CARD HAND
 import random
 
@@ -21,10 +22,10 @@ class Deck(Card):
     def deal(self):
         player_hand = []
         while len(player_hand) < 7:
-            random_card = Card.possible_suit[random.randint(0,len(Card.possible_suit)-1)] + Card.possible_cards[random.randint(0,len(Card.possible_cards)-1)]
+            random_card = random.choice(Card.possible_suit) + random.choice(Card.possible_cards)
             if random_card not in player_hand and random_card not in self.hand_cache:
                 player_hand.append(random_card)
-        self.hand_cache+=player_hand
+        self.hand_cache.append(player_hand)
         self.update()
         return player_hand
 
@@ -46,7 +47,7 @@ class Player(Deck):
     def __init__(self, deck, name):
         self.hand = deck.deal()
         self.name = name
-        self.pair_deck = []
+        self.score = 0
 
     def player_turn(self,opp, deck):
         turn_over = False
@@ -55,27 +56,31 @@ class Player(Deck):
             card_count = len(self.hand)
             card_arr = [i for i in range(1,card_count+1)]
             do_you_have = input("Please chose a card between 1 and {}:".format(card_count))
-            if int(do_you_have) not in card_arr:
-                print('Invalid entry!')
-            else:
-                # create a list of each players hand, card only suit is ignored
-                opp_hand = [card[1:] for card in opp.hand]
-                self_hand = [card[1:] for card in self.hand]
-                # assign the compartive card vaue
-                comp_card = self.hand[int(do_you_have)-1][1:]
-                # if we find a match in the opposite hand then we can take both cards and put them in our pair_deck
-                if comp_card in opp_hand:
-                    self.pair_deck.append([self.hand[int(do_you_have)-1], opp.hand[opp_hand.index(comp_card)]])
-                    opp.hand.pop(opp_hand.index(comp_card))
-                    self.hand.pop(self_hand.index(comp_card))
+            if do_you_have.isnumeric():
+                if int(do_you_have) not in card_arr:
+                    print('Invalid entry!')
                 else:
-                    deck.draw_card(self)
-                    print("Go fish!")
-                    print("_____________________________________________________________")
-                    print("You now have {} cards in your hand!".format(len(self.hand)))
-                    print("There are {} cards left in the deck".format(len(deck.new_deck)))
-                    print("_____________________________________________________________")
-                    turn_over = True
+                    # create a list of each players hand, card only suit is ignored
+                    opp_hand = [card[1:] for card in opp.hand]
+                    self_hand = [card[1:] for card in self.hand]
+                    # assign the compartive card vaue
+                    comp_card = self.hand[int(do_you_have)-1][1:]
+                    # if we find a match in the opposite hand then we can take both cards and put them in our pair_deck
+                    if comp_card in opp_hand:
+                        self.score+=1
+                        opp.hand.pop(opp_hand.index(comp_card))
+                        self.hand.pop(self_hand.index(comp_card))
+                    else:
+                        deck.draw_card(self)
+                        print("Go fish!")
+                        print("_____________________________________________________________")
+                        print("You now have {} cards in your hand!".format(len(self.hand)))
+                        print("There are {} cards left in the deck".format(len(deck.new_deck)))
+                        print("_____________________________________________________________")
+                        turn_over = True
+            else:
+                print('invalid entry')
+
 
 
 fresh_deck = Deck()
@@ -89,16 +94,15 @@ def game():
         print("{}'s turn".format(second_player.name))
         second_player.player_turn(first_player,fresh_deck)
 
-    first_player_score = len(first_player.pair_deck)
-    second_player_score = len(second_player.pair_deck)
-    if first_player_score > second_player_score:
+
+    if first_player.score > second_player.score:
         print("{} WINS!".format(first_player.name))
-        print("{} to {}".format(first_player_score,second_player_score))
-    elif first_player_score == second_player_score:
+        print("{} to {}".format(first_player.score,second_player.score))
+    elif first_player.score == second_player.score:
         print("Tie!")
-        print("{} to {}".format(second_player_score,first_player_score))
+        print("{} to {}".format(second_player.score,first_player.score))
     else:
         print("{} WINS!".format(second_player.name))
-        print("{} to {}".format(second_player_score,first_player_score))
+        print("{} to {}".format(second_player.score,first_player.score))
 
 game()
