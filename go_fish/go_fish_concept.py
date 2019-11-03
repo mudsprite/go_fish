@@ -49,51 +49,75 @@ class Player(Deck):
         self.name = name
         self.score = 0
 
-    def player_turn(self,opp, deck):
+    def player_turn(self, opp, deck ):
         turn_over = False
         while not turn_over:
-            print("Your current hand {}".format(" ".join(self.hand)))
-            card_count = len(self.hand)
-            card_arr = [i for i in range(1,card_count+1)]
-            do_you_have = input("Please chose a card between 1 and {}:".format(card_count))
-            if do_you_have.isnumeric():
-                if int(do_you_have) not in card_arr:
-                    print('Invalid entry!')
-                else:
-                    # create a list of each players hand, card only suit is ignored
-                    opp_hand = [card[1:] for card in opp.hand]
-                    self_hand = [card[1:] for card in self.hand]
-                    # assign the compartive card vaue
-                    comp_card = self.hand[int(do_you_have)-1][1:]
-                    # if we find a match in the opposite hand then we can take both cards and put them in our pair_deck
-                    if comp_card in opp_hand:
-                        self.score+=1
-                        opp.hand.pop(opp_hand.index(comp_card))
-                        self.hand.pop(self_hand.index(comp_card))
+                print("\nYour current hand {}".format(" ".join(self.hand)))
+                card_count = len(self.hand)
+                card_arr = [i for i in range(1,card_count+1)]
+                do_you_have = input("\nPlease chose a card between 1 and {} from your hand:".format(card_count))
+                if do_you_have.isnumeric():
+                    if int(do_you_have) not in card_arr:
+                        print('Invalid entry!')
                     else:
-                        deck.draw_card(self)
-                        print("Go fish!")
-                        print("_____________________________________________________________")
-                        print("You now have {} cards in your hand!".format(len(self.hand)))
-                        print("There are {} cards left in the deck".format(len(deck.new_deck)))
-                        print("_____________________________________________________________")
-                        turn_over = True
-            else:
-                print('invalid entry')
+                        # create a list of each players hand, card only suit is ignored
+                        opp_hand = [card[1:] for card in opp.hand]
+                        self_hand = [card[1:] for card in self.hand]
+                        # assign the compartive card vaue
+                        comp_card = self.hand[int(do_you_have)-1][1:]
+                        # if we find a match in the opposite hand then we can take both cards and put them in our pair_deck
+                        if comp_card in opp_hand:
+                            print('\nMATCH! Go Again!')
+                            self.score+=1
+                            opp.hand.pop(opp_hand.index(comp_card))
+                            self.hand.pop(self_hand.index(comp_card))
+                        else:
+                            deck.draw_card(self)
+                            print("\n_____________________________________________________________")
+                            print("Go fish!")
+                            print("You now have {} cards in your hand!".format(len(self.hand)))
+                            print("There are {} cards left in the deck".format(len(deck.new_deck)))
+                            print("_____________________________________________________________")
+                            turn_over = True
+                else:
+                    print('Invalid entry')
 
+    def ai_turn(self, opp, deck):
+        turn_over = False
+        while not turn_over:
+                print("\nAI's current hand {}".format(" ".join(self.hand)))
+                card_count = len(self.hand)
+                card_arr = [i for i in range(1,card_count+1)]
+                do_you_have = int(random.choice(card_arr))
+                # create a list of each players hand, card only suit is ignored
+                opp_hand = [card[1:] for card in opp.hand]
+                self_hand = [card[1:] for card in self.hand]
+                # assign the compartive card vaue
+                comp_card = self.hand[int(do_you_have)-1][1:]
+                # if we find a match in the opposite hand then we can take both cards and put them in our pair_deck
+                if comp_card in opp_hand:
+                    self.score+=1
+                    opp.hand.pop(opp_hand.index(comp_card))
+                    self.hand.pop(self_hand.index(comp_card))
+                else:
+                    deck.draw_card(self)
+                    print("\n_____________________________________________________________")
+                    print("{} has gone fishing!".format(self.name))
+                    print("{} now has {} cards in their hand!".format(self.name,len(self.hand)))
+                    print("_____________________________________________________________")
+                    turn_over = True
 
 
 fresh_deck = Deck()
 first_player = Player(fresh_deck, "Player 1")
-second_player = Player(fresh_deck, "PLayer 2")
+second_player = Player(fresh_deck, "AI")
 
 def game():
     while len(fresh_deck.new_deck) > 0:
         print("{}'s turn".format(first_player.name))
         first_player.player_turn(second_player,fresh_deck)
         print("{}'s turn".format(second_player.name))
-        second_player.player_turn(first_player,fresh_deck)
-
+        second_player.ai_turn(first_player, fresh_deck)
 
     if first_player.score > second_player.score:
         print("{} WINS!".format(first_player.name))
